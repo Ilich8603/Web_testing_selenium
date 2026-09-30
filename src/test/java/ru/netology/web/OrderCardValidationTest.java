@@ -36,16 +36,18 @@ public class OrderCardValidationTest {
     }
 
 
-
     void fillName(String value) {
         driver.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys(value);
     }
+
     void fillPhone(String value) {
         driver.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys(value);
     }
+
     void checkAgreement() {
         driver.findElement(By.cssSelector("[data-test-id=agreement]")).click();
     }
+
     void submit() {
         driver.findElement(By.cssSelector("form button.button")).click();
     }
@@ -57,11 +59,12 @@ public class OrderCardValidationTest {
     }
 
 
-    @Test // всё пусто → подсвечено только имя
+    @Test
+        // всё пусто → подсвечено только имя
     void shouldHighlightOnlyNameWhenAllEmpty() {
         submit();
 
-        String actual   = errorMessage("name");
+        String actual = errorMessage("name");
         String expected = "Поле обязательно для заполнения";
 
         assertEquals(expected, actual);
@@ -69,13 +72,14 @@ public class OrderCardValidationTest {
         assertEquals("", errorMessage("agreement"));
     }
 
-    @Test // имя валидно, телефон пустой → подсвечен только телефон
+    @Test
+        // имя валидно, телефон пустой → подсвечен только телефон
     void shouldHighlightPhoneWhenNameOk() {
         fillName("Иванов Иван");
         checkAgreement();
         submit();
 
-        String actual   = errorMessage("phone");
+        String actual = errorMessage("phone");
         String expected = "Поле обязательно для заполнения";
 
         assertEquals(expected, actual);
@@ -83,7 +87,8 @@ public class OrderCardValidationTest {
         assertEquals("", errorMessage("agreement"));
     }
 
-    @Test // имя и телефон валидны, чекбокс не отмечен → подсвечен только чекбокс
+    @Test
+        // имя и телефон валидны, чекбокс не отмечен → подсвечен только чекбокс
     void shouldHighlightAgreementWhenFieldsOk() {
         fillName("Иванов Иван");
         fillPhone("+79999999999");
@@ -99,14 +104,15 @@ public class OrderCardValidationTest {
         assertEquals("", errorMessage("phone"));
     }
 
-    @Test // латиница в имени → имя подсвечено
+    @Test
+        // латиница в имени → имя подсвечено
     void shouldHighlightNameWhenLatinLetters() {
         fillName("Ivan");
         fillPhone("+79999999999");
         checkAgreement();
         submit();
 
-        String actual   = errorMessage("name");
+        String actual = errorMessage("name");
         String expected = "Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.";
 
         assertEquals(expected, actual);
@@ -114,14 +120,15 @@ public class OrderCardValidationTest {
         assertEquals("", errorMessage("agreement"));
     }
 
-    @Test // не буквы в имени → имя подсвечено
+    @Test
+        // не буквы в имени → имя подсвечено
     void shouldHighlightNameWhenNotLetters() {
         fillName("1van");
         fillPhone("+79999999999");
         checkAgreement();
         submit();
 
-        String actual   = errorMessage("name");
+        String actual = errorMessage("name");
         String expected = "Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.";
 
         assertEquals(expected, actual);
@@ -129,14 +136,15 @@ public class OrderCardValidationTest {
         assertEquals("", errorMessage("agreement"));
     }
 
-    @Test // телефон без "+" → телефон подсвечен
+    @Test
+        // телефон без "+" → телефон подсвечен
     void shouldHighlightPhoneWhenNoPlus() {
         fillName("Иванов Иван");
         fillPhone("89999999999");
         checkAgreement();
         submit();
 
-        String actual   = errorMessage("phone");
+        String actual = errorMessage("phone");
         String expected = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
 
         assertEquals(expected, actual);
@@ -145,14 +153,15 @@ public class OrderCardValidationTest {
 
     }
 
-    @Test // телефон меньше 11 цифр → телефон подсвечен
+    @Test
+        // телефон меньше 11 цифр → телефон подсвечен
     void shouldHighlightPhoneWhenLessThanEleven() {
         fillName("Иванов Иван");
         fillPhone("+8997996959");
         checkAgreement();
         submit();
 
-        String actual   = errorMessage("phone");
+        String actual = errorMessage("phone");
         String expected = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
 
         assertEquals(expected, actual);
@@ -161,14 +170,15 @@ public class OrderCardValidationTest {
 
     }
 
-    @Test // телефон больше 11 цифр → телефон подсвечен
+    @Test
+        // телефон больше 11 цифр → телефон подсвечен
     void shouldHighlightPhoneWhenMoreThanEleven() {
         fillName("Иванов Иван");
         fillPhone("+899799695949");
         checkAgreement();
         submit();
 
-        String actual   = errorMessage("phone");
+        String actual = errorMessage("phone");
         String expected = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
 
         assertEquals(expected, actual);
@@ -177,14 +187,15 @@ public class OrderCardValidationTest {
 
     }
 
-    @Test // телефон с буквами → телефон подсвечен
+    @Test
+        // телефон с буквами → телефон подсвечен
     void shouldHighlightPhoneWhenLetters() {
         fillName("Иванов Иван");
         fillPhone("+79999999a99");
         checkAgreement();
         submit();
 
-        String actual   = errorMessage("phone");
+        String actual = errorMessage("phone");
         String expected = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
 
         assertEquals(expected, actual);
@@ -193,14 +204,15 @@ public class OrderCardValidationTest {
     }
 
 
-    @Test // телефон только с "+" → телефон подсвечен
+    @Test
+        // телефон только с "+" → телефон подсвечен
     void shouldHighlightPhoneWhenOnlyPlus() {
         fillName("Иванов Иван");
         fillPhone("+");
         checkAgreement();
         submit();
 
-        String actual   = errorMessage("phone");
+        String actual = errorMessage("phone");
         String expected = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
 
         assertEquals(expected, actual);
