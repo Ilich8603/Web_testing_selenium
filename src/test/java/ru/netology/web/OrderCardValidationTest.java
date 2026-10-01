@@ -52,10 +52,29 @@ public class OrderCardValidationTest {
         driver.findElement(By.cssSelector("form button.button")).click();
     }
 
-    String errorMessage(String testId) {
-        var list = driver.findElements(By.cssSelector(
-                "[data-test-id='" + testId + "'].input_invalid .input__sub"));
-        return list.isEmpty() ? "" : list.get(0).getText().trim();
+    WebElement errorField(String testId) {
+        return driver.findElement(
+                By.cssSelector("[data-test-id='" + testId + "'].input_invalid .input__sub"));
+    }
+
+    boolean hasInvalidClass(String testId) {
+        return driver.findElement(By.cssSelector("[data-test-id=" + testId + "]"))
+                .getAttribute("class").contains("input_invalid");
+
+    }
+
+
+    @Test
+    void shouldSubmitOrderFormSuccessfully() {
+        fillName("Иванов Иван");
+        fillPhone("+79999999999");
+        checkAgreement();
+        submit();
+
+        WebElement success = driver.findElement(By.cssSelector("[data-test-id='order-success']"));
+        assertTrue(success.isDisplayed());
+        assertEquals("Ваша заявка успешно отправлена! " +
+                "Наш менеджер свяжется с вами в ближайшее время.", success.getText().trim());
     }
 
 
@@ -64,12 +83,12 @@ public class OrderCardValidationTest {
     void shouldHighlightOnlyNameWhenAllEmpty() {
         submit();
 
-        String actual = errorMessage("name");
-        String expected = "Поле обязательно для заполнения";
+        WebElement nameError = errorField("name");
+        assertTrue(nameError.isDisplayed());
+        assertEquals("Поле обязательно для заполнения", nameError.getText().trim());
 
-        assertEquals(expected, actual);
-        assertEquals("", errorMessage("phone"));
-        assertEquals("", errorMessage("agreement"));
+        assertFalse(hasInvalidClass("phone"));
+        assertFalse(hasInvalidClass("agreement"));
     }
 
     @Test
@@ -79,12 +98,12 @@ public class OrderCardValidationTest {
         checkAgreement();
         submit();
 
-        String actual = errorMessage("phone");
-        String expected = "Поле обязательно для заполнения";
+        WebElement phoneError = errorField("phone");
+        assertTrue(phoneError.isDisplayed());
+        assertEquals("Поле обязательно для заполнения", phoneError.getText().trim());
 
-        assertEquals(expected, actual);
-        assertEquals("", errorMessage("name"));
-        assertEquals("", errorMessage("agreement"));
+        assertFalse(hasInvalidClass("name"));
+        assertFalse(hasInvalidClass("agreement"));
     }
 
     @Test
@@ -94,14 +113,12 @@ public class OrderCardValidationTest {
         fillPhone("+79999999999");
         submit();
 
-        String actual = driver.findElement(By.cssSelector("[data-test-id=agreement]"))
-                .getAttribute("class")
-                .contains("input_invalid") ? "true" : "false";
-        String expected = "true";
+        WebElement errorAgreement = driver.findElement(
+                By.cssSelector("[data-test-id='agreement'].input_invalid"));
+        assertTrue(errorAgreement.isDisplayed());
 
-        assertEquals(expected, actual);
-        assertEquals("", errorMessage("name"));
-        assertEquals("", errorMessage("phone"));
+        assertFalse(hasInvalidClass("name"));
+        assertFalse(hasInvalidClass("phone"));
     }
 
     @Test
@@ -112,28 +129,30 @@ public class OrderCardValidationTest {
         checkAgreement();
         submit();
 
-        String actual = errorMessage("name");
-        String expected = "Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.";
+        WebElement nameError = errorField("name");
+        assertTrue(nameError.isDisplayed());
+        assertEquals("Имя и Фамилия указаные неверно." +
+                " Допустимы только русские буквы, пробелы и дефисы.", nameError.getText().trim());
 
-        assertEquals(expected, actual);
-        assertEquals("", errorMessage("phone"));
-        assertEquals("", errorMessage("agreement"));
+        assertFalse(hasInvalidClass("phone"));
+        assertFalse(hasInvalidClass("agreement"));
     }
 
     @Test
         // не буквы в имени → имя подсвечено
     void shouldHighlightNameWhenNotLetters() {
-        fillName("1van");
+        fillName("1ванов");
         fillPhone("+79999999999");
         checkAgreement();
         submit();
 
-        String actual = errorMessage("name");
-        String expected = "Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.";
+        WebElement nameError = errorField("name");
+        assertTrue(nameError.isDisplayed());
+        assertEquals("Имя и Фамилия указаные неверно." +
+                " Допустимы только русские буквы, пробелы и дефисы.", nameError.getText().trim());
 
-        assertEquals(expected, actual);
-        assertEquals("", errorMessage("phone"));
-        assertEquals("", errorMessage("agreement"));
+        assertFalse(hasInvalidClass("phone"));
+        assertFalse(hasInvalidClass("agreement"));
     }
 
     @Test
@@ -144,12 +163,13 @@ public class OrderCardValidationTest {
         checkAgreement();
         submit();
 
-        String actual = errorMessage("phone");
-        String expected = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
+        WebElement phoneError = errorField("phone");
+        assertTrue(phoneError.isDisplayed());
+        assertEquals("Телефон указан неверно." +
+                " Должно быть 11 цифр, например, +79012345678.", phoneError.getText().trim());
 
-        assertEquals(expected, actual);
-        assertEquals("", errorMessage("name"));
-        assertEquals("", errorMessage("agreement"));
+        assertFalse(hasInvalidClass("name"));
+        assertFalse(hasInvalidClass("agreement"));
 
     }
 
@@ -161,12 +181,13 @@ public class OrderCardValidationTest {
         checkAgreement();
         submit();
 
-        String actual = errorMessage("phone");
-        String expected = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
+        WebElement phoneError = errorField("phone");
+        assertTrue(phoneError.isDisplayed());
+        assertEquals("Телефон указан неверно." +
+                " Должно быть 11 цифр, например, +79012345678.", phoneError.getText().trim());
 
-        assertEquals(expected, actual);
-        assertEquals("", errorMessage("name"));
-        assertEquals("", errorMessage("agreement"));
+        assertFalse(hasInvalidClass("name"));
+        assertFalse(hasInvalidClass("agreement"));
 
     }
 
@@ -178,12 +199,13 @@ public class OrderCardValidationTest {
         checkAgreement();
         submit();
 
-        String actual = errorMessage("phone");
-        String expected = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
+        WebElement phoneError = errorField("phone");
+        assertTrue(phoneError.isDisplayed());
+        assertEquals("Телефон указан неверно." +
+                " Должно быть 11 цифр, например, +79012345678.", phoneError.getText().trim());
 
-        assertEquals(expected, actual);
-        assertEquals("", errorMessage("name"));
-        assertEquals("", errorMessage("agreement"));
+        assertFalse(hasInvalidClass("name"));
+        assertFalse(hasInvalidClass("agreement"));
 
     }
 
@@ -195,12 +217,13 @@ public class OrderCardValidationTest {
         checkAgreement();
         submit();
 
-        String actual = errorMessage("phone");
-        String expected = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
+        WebElement phoneError = errorField("phone");
+        assertTrue(phoneError.isDisplayed());
+        assertEquals("Телефон указан неверно." +
+                " Должно быть 11 цифр, например, +79012345678.", phoneError.getText().trim());
 
-        assertEquals(expected, actual);
-        assertEquals("", errorMessage("name"));
-        assertEquals("", errorMessage("agreement"));
+        assertFalse(hasInvalidClass("name"));
+        assertFalse(hasInvalidClass("agreement"));
     }
 
 
@@ -212,12 +235,14 @@ public class OrderCardValidationTest {
         checkAgreement();
         submit();
 
-        String actual = errorMessage("phone");
-        String expected = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
+        WebElement phoneError = errorField("phone");
+        assertTrue(phoneError.isDisplayed());
+        assertEquals("Телефон указан неверно." +
+                " Должно быть 11 цифр, например, +79012345678.", phoneError.getText().trim());
 
-        assertEquals(expected, actual);
-        assertEquals("", errorMessage("name"));
-        assertEquals("", errorMessage("agreement"));
+        assertFalse(hasInvalidClass("name"));
+        assertFalse(hasInvalidClass("agreement"));
+        ;
     }
 
 }
